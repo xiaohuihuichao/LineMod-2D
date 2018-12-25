@@ -1,0 +1,21 @@
+CMAKE_MINIMUM_REQUIRED( VERSION 3.0 )
+
+PROJECT( LocationRotation )
+
+AUX_SOURCE_DIRECTORY( . DIR_MAIN )
+
+SET( OpenCV_DIR "E:/mario.he/opencv-2.4.13/build" )
+
+FIND_PACKAGE( OpenCV REQUIRED )
+
+INCLUDE_DIRECTORIES( . )
+
+
+FILE(GLOB_RECURSE HEADERS *.h *.hpp)
+SOURCE_GROUP("Include" FILES ${HEADERS} ) 
+
+
+ADD_EXECUTABLE( LocationRotation ${DIR_MAIN} ${HEADERS} )
+
+
+TARGET_LINK_LIBRARIES( LocationRotation ${OpenCV_LIBS} )
