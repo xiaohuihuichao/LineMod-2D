@@ -1,5 +1,5 @@
-#ifndef GOERTEK_LOCATIONROTATION_H_
-#define GOERTEK_LOCATIONROTATION_H_
+#ifndef LOCATIONROTATION_H_
+#define LOCATIONROTATION_H_
 
 #include <iostream>
 #include <math.h>
@@ -171,4 +171,4 @@ public:
 
 void showProgressBar(float total, float current, int num=10);
 
-#endif	//GOERTEK_LOCATIONROTATION_H_
+#endif	//LOCATIONROTATION_H_
