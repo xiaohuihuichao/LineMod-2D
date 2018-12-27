@@ -1,4 +1,4 @@
-#include "Goertek_LocationRotation.h"
+#include "LocationRotation.h"
 
 
 Train::Train(char *imgPath, int _num_feature) : m_num_feature(_num_feature)
@@ -45,7 +45,7 @@ void Train::imageProcess(const int &filterKernel)
 }
 
 
-//½«m_angleMatÀëÉ¢Îª0~8
+//å°†m_angleMatç¦»æ•£ä¸º0~8
 void Train::angleDiscretization()
 {
 	m_angleMat = m_angleMat * 16 / 360;
@@ -62,7 +62,7 @@ void Train::angleDiscretization()
 }
 
 
-//ÌØÕ÷µãÉ¸Ñ¡
+//ç‰¹å¾ç‚¹ç­›é€‰
 void Train::featureSelect(const float &threshold)
 {
 	Mat angle_unfilter;
@@ -71,7 +71,7 @@ void Train::featureSelect(const float &threshold)
 	vector<Feature> candidates;
 	candidates.clear();
 
-	//Roi * RoiÁÚÓò
+	//Roi * Roié‚»åŸŸ
 	int Roi = SELECT_ROI;
 	for (int r = Roi / 2; r < angle_unfilter.rows - Roi / 2; ++r)
 	{
@@ -91,10 +91,10 @@ void Train::featureSelect(const float &threshold)
 						histogram[patchnxn_row[roi_c]]++;
 					}
 					/*
-						setp[0]: ÏßµÄÊı¾İÁ¿´óĞ¡£¬µ¥Î»Îª×Ö½Ú	channel * col * sizeof(type)
-						setp[1]: µãµÄÊı¾İÁ¿´óĞ¡£¬µ¥Î»Îª×Ö½Ú	channel * sizeof(type)
-						step1(0): ÏßµÄÍ¨µÀÊıÁ¿£¬channel * col
-						step1(1): µãµÄÍ¨µÀÊıÁ¿£¬channel
+						setp[0]: çº¿çš„æ•°æ®é‡å¤§å°ï¼Œå•ä½ä¸ºå­—èŠ‚	channel * col * sizeof(type)
+						setp[1]: ç‚¹çš„æ•°æ®é‡å¤§å°ï¼Œå•ä½ä¸ºå­—èŠ‚	channel * sizeof(type)
+						step1(0): çº¿çš„é€šé“æ•°é‡ï¼Œchannel * col
+						step1(1): ç‚¹çš„é€šé“æ•°é‡ï¼Œchannel
 					*/
 					patchnxn_row += angle_unfilter.step1(0);
 				}
@@ -118,14 +118,14 @@ void Train::featureSelect(const float &threshold)
 				}
 			}
 		}
-	}//ÔÚ·ù¶ÈÖµ>threshold ÇÒ3x3ÁÚÓòÄÚÄ³Ò»½Ç¶ÈÊıÁ¿³¬¹ı5Ôòemplace_back()
+	}//åœ¨å¹…åº¦å€¼>threshold ä¸”3x3é‚»åŸŸå†…æŸä¸€è§’åº¦æ•°é‡è¶…è¿‡5åˆ™emplace_back()
 	if (candidates.size() < m_num_feature)
 	{
 		m_num_feature = candidates.size();
 		cout << "after angle select : num of candidates is " << candidates.size() << ".\n";
 	}
 
-	//ÔÚÉÏÃæµÄfeatureÀïÃæ²éÕÒÆäÊÇ·ñÎª3x3ÁÚÓòÄÚµÄ¼«´óÖµ
+	//åœ¨ä¸Šé¢çš„featureé‡Œé¢æŸ¥æ‰¾å…¶æ˜¯å¦ä¸º3x3é‚»åŸŸå†…çš„æå¤§å€¼
 	int nms_kernel_size = SELECT_KERNEL_SIZE;
 	auto iter = candidates.begin();
 	while (iter != candidates.end())
@@ -146,7 +146,7 @@ void Train::featureSelect(const float &threshold)
 				{
 					continue;
 				}
-				//ÁÚÓòÄÚÓĞ´óÓÚÌØÕ÷µãµÄÖµ£¬ÔòÖÃfalse
+				//é‚»åŸŸå†…æœ‰å¤§äºç‰¹å¾ç‚¹çš„å€¼ï¼Œåˆ™ç½®false
 				if (mag < m_gradMat.ptr<float>(r + r_offset)[c + c_offset])
 				{
 					top = false;
@@ -169,7 +169,7 @@ void Train::featureSelect(const float &threshold)
 		cout << "after magnitude select : num of candidates is " << candidates.size() << ".\n";
 	}
 
-	//É¸Ñ¡ÀëÉ¢µÄÌØÕ÷µã
+	//ç­›é€‰ç¦»æ•£çš„ç‰¹å¾ç‚¹
 	sort(candidates.rbegin(), candidates.rend());
 	//stable_sort(candidates.rbegin(), candidates.rend());
 
@@ -177,7 +177,7 @@ void Train::featureSelect(const float &threshold)
 	double distance_sq = 1. * candidates.size() / m_num_feature * 2;
 
 	features.clear();
-	//ÊÇ·ñÂú×ãdistanceµÄÒªÇó
+	//æ˜¯å¦æ»¡è¶³distanceçš„è¦æ±‚
 	for (size_t i = 0; i < candidates.size(); ++i)
 	{
 		if (features.size() == m_num_feature)
@@ -300,7 +300,7 @@ void Train::operator>>(const char *path) const
 	for (unsigned int angle = 0; angle < 360; ++angle)
 	{
 		fs << "angle_" + to_string(angle) << "{";
-		//Ã¿Ò»¶ÈÊÇÒ»¸övector<Feature>
+		//æ¯ä¸€åº¦æ˜¯ä¸€ä¸ªvector<Feature>
 		int feature_count = featurePerImg[angle].size();
 		fs << "feature_count" << feature_count;
 		for (size_t i = 0; i < feature_count; ++i)
@@ -437,38 +437,38 @@ void LocationRotation::imageProcess(const int &filterKernel)
 {
 	Mat smoothed;
 	// For some reason cvSmooth/cv::GaussianBlur, cvSobel/cv::Sobel have different defaults for border handling...
-	//¸ßË¹ÂË²¨
+	//é«˜æ–¯æ»¤æ³¢
 	GaussianBlur(img, smoothed, Size(filterKernel, filterKernel), 0, 0, BORDER_REPLICATE);
 
 	if (1 == img.channels())
 	{
 		Mat sobel_dx, sobel_dy;
-		//////////¡¶OpenCV3±à³ÌÈëÃÅ¡·ÊéÀïËµ£¬µ±kernel_size=3Ê±£¬Ê¹ÓÃScharrÆä½á¹û¸ü¾«È·£¬ÇÒÔËĞĞËÙ¶ÈÓë3x3µÄSobelÒ»Ñù¿ì¡£
-		//±ß½çÄ£Ê½ÊÇBORDER_REPLICATE¡ª¡ª¸´ÖÆ×î±ßÔµµÄÏñËØ¡£
+		//////////ã€ŠOpenCV3ç¼–ç¨‹å…¥é—¨ã€‹ä¹¦é‡Œè¯´ï¼Œå½“kernel_size=3æ—¶ï¼Œä½¿ç”¨Scharrå…¶ç»“æœæ›´ç²¾ç¡®ï¼Œä¸”è¿è¡Œé€Ÿåº¦ä¸3x3çš„Sobelä¸€æ ·å¿«ã€‚
+		//è¾¹ç•Œæ¨¡å¼æ˜¯BORDER_REPLICATEâ€”â€”å¤åˆ¶æœ€è¾¹ç¼˜çš„åƒç´ ã€‚
 		Sobel(smoothed, sobel_dx, CV_32F, 1, 0, 3, 1.0, 0.0, BORDER_REPLICATE);
 		Sobel(smoothed, sobel_dy, CV_32F, 0, 1, 3, 1.0, 0.0, BORDER_REPLICATE);
 		//	Scharr(smoothed, sobel_dx, CV_32F, 1, 0, 1.0, 0.0, BORDER_REPLICATE);
 		//	Scharr(smoothed, sobel_dx, CV_32F, 0, 1, 1.0, 0.0, BORDER_REPLICATE);
-		//·ùÖµµÄÆ½·½
+		//å¹…å€¼çš„å¹³æ–¹
 		//CV_32F == float
 		//CV_64F == double
 		m_gradMat = Mat::zeros(sobel_dx.size(), CV_32F);
 		m_gradMat = sobel_dx.mul(sobel_dx) + sobel_dy.mul(sobel_dy);
-		//¸ù¾İsobel_xºÍsobel_yÇó½Ç¶È£¬Êä³öÎªsobel_ag
+		//æ ¹æ®sobel_xå’Œsobel_yæ±‚è§’åº¦ï¼Œè¾“å‡ºä¸ºsobel_ag
 		phase(sobel_dx, sobel_dy, m_angleMat, true);
 	}
 }
 
 
-//½«m_angleMatÀëÉ¢Îª0~8
+//å°†m_angleMatç¦»æ•£ä¸º0~8
 void LocationRotation::angleDiscretization()
 {
-	//m_angleMat * 16.0 / 360¡£½«m_angleMatÀëÉ¢Îª16¸ö¼¶±ğ0~15
+	//m_angleMat * 16.0 / 360ã€‚å°†m_angleMatç¦»æ•£ä¸º16ä¸ªçº§åˆ«0~15
 	m_angleMat = m_angleMat * 16 / 360;
 	m_angleMat.convertTo(m_angleMat, CV_8U);
 
-	//0~7	==>	0~7		0~180¶È±äÎª0~7
-	//8~15 ==> 0~7		181~360±äÎª0~7
+	//0~7	==>	0~7		0~180åº¦å˜ä¸º0~7
+	//8~15 ==> 0~7		181~360å˜ä¸º0~7
 	for (int r = 0; r < m_angleMat.rows; ++r)
 	{
 		uchar *angle_r = m_angleMat.ptr<uchar>(r);
@@ -642,7 +642,7 @@ void LocationRotation::toFind(const int &angleStart, const int &angleEnd, const 
 	{
 		for (int c = colStart; c < colEnd;  c += T / 2 + 1)
 		{
-			//360´Î
+			//360æ¬¡
 
 			for (int i = angleStart; i < angleEnd; i += angleStep)
 			{
